@@ -3,6 +3,7 @@ const router = express()
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const dotenv = require('dotenv')
 
 const fileUpload = require('express-fileupload')
 const AWS = require('aws-sdk')
@@ -13,6 +14,7 @@ const queries = require('../utils/queries')
 
 router.use(express.json())
 router.use(cors())
+dotenv.config()
 
 AWS.config.update({region: 'us-east-2'})
 
@@ -20,8 +22,8 @@ router.use(fileUpload({ limits: { fileSize: 50*1024*1024 } }))
 
 s3 = new AWS.S3({
     credentials: {
-        accessKeyId: "AKIAQUQGRZJU3JVT2XUX",
-        secretAccessKey: "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"
+        accessKeyId: process.env.S3_KEY,
+        secretAccessKey: process.env.S3_SECRET
     }
 })
 
