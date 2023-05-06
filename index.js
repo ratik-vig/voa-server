@@ -13,7 +13,7 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.send('hello world')
+    res.send('hello Deepika')
 })
 
 app.use('/api/v1/users', userController)
