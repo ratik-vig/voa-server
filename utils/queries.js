@@ -34,7 +34,16 @@ const queries = {
     getShowTime: "select start_time, end_time from rdh_show_timings where time_id=?",
     issueParkingTicket: "insert into rdh_parking_tick(in_time, visitor_id, parking_fee) values(?,?,10.0)",
     getParkingTicket: "select * from rdh_parking_tick where parking_id=?",
-    addExitTime: "insert into rdh_parking_tick(out_time, order_id) values (?,?)"
-}
+    addExitTime: "insert into rdh_parking_tick(out_time, order_id) values (?,?)",
+    getTopAttractions: "select * from rdh_attraction limit 4",
+    getTopShows: "select * from rdh_show limit 4",
+    getTopStores: "select * from rdh_store limit 4",
+    getStoreOrdersByUid: "select distinct(order_id) from rdh_order natural join rdh_order_sku natural join rdh_visitor natural join rdh_ticket natural join rdh_user u where u.user_id=?",
+    getShowOrdersByUid: "select distinct(order_id) from rdh_order natural join rdh_show_ticket natural join rdh_visitor natural join rdh_ticket natural join rdh_user u where u.user_id=?",
+    getTicketOrdersByUid: "select distinct(t_order_id) from rdh_ticket_order natural join rdh_ticket natural join rdh_user u where u.user_id=?",
+    getVisitorsByType: "SELECT visitor_type, COUNT(*) as count FROM rdh_visitor GROUP BY visitor_type",
+    getTopSellingSKUs: "SELECT t2.sku_name, SUM(t1.qty) as total_quantity FROM rdh_order_sku t1 JOIN rdh_sku t2 ON t1.sku_id = t2.sku_id GROUP BY t1.sku_id ORDER BY total_quantity DESC LIMIT 10",
+    getTopVisitedAtrns: "select atrn_name, count(*) as count from rdh_attraction natural join rdh_visit_atrn group by atrn_name limit 10"
+}   
   
 module.exports = queries 

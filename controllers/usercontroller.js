@@ -137,6 +137,19 @@ router.get('/ticketOrderDetails', (req, res) => {
     })
 })
 
+router.get('/getOrdersByUId', (req, res) => {
+    const { user_id } = req.query
+    console.log(user_id)
+    db.query(queries.getTicketOrdersByUid, [user_id], (err, result) => {
+        if(err) throw err
+        if(!result[0]) {
+            res.sendStatus(404)
+            return
+        }
+        res.send(result)
+    })
+})
+
 router.post('/uploadImages', (req, res) => {
     const uploadParams = {
         Bucket: 'voa-imgs',

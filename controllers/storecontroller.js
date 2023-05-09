@@ -79,5 +79,27 @@ router.get('/getOrderDetails', (req, res) => {
     })
 })
 
+router.get('/getTopStores', (req, res) => {
+    try{
+        db.query(queries.getTopStores, (err, result) => {
+            if(err) throw err      
+            res.send(result)      
+        })
+    }catch(err){
+        console.log(err)
+    }
+})
 
+router.get('/getOrdersByUId', (req, res) => {
+    const { user_id } = req.query
+    console.log(user_id)
+    db.query(queries.getStoreOrdersByUid, [user_id], (err, result) => {
+        if(err) throw err
+        if(!result[0]) {
+            res.sendStatus(404)
+            return
+        }
+        res.send(result)
+    })
+})
 module.exports = router 

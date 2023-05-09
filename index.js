@@ -8,6 +8,7 @@ const showController = require('./controllers/showcontroller')
 const storeController = require('./controllers/storecontroller')
 const visitorController = require('./controllers/visitorcontroller')
 const parkingController = require('./controllers/parkingcontroller')
+const adminController = require('./controllers/admincontroller')
 
 dotenv.config()
 
@@ -25,6 +26,7 @@ app.use('/api/v1/shows', showController)
 app.use('/api/v1/stores', storeController)
 app.use('/api/v1/visitors', visitorController)
 app.use('/api/v1/parking', parkingController)
+app.use('/api/v1/admin', adminController)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {

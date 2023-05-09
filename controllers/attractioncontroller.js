@@ -34,4 +34,15 @@ router.get('/getAttractionById', (req, res) => {
     })
 })
 
+router.get('/getTopAttractions', (req, res) => {
+    try{
+        db.query(queries.getTopAttractions, (err, result) => {
+            if(err) throw err      
+            res.send(result)      
+        })
+    }catch(err){
+        console.log(err)
+    }
+})
+
 module.exports = router

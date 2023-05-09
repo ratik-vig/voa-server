@@ -68,6 +68,8 @@ router.post('/payTicket', async(req, res) => {
             params.push(cvv)
             params.push(cardType)
         }
+        console.log(q)
+        console.log(params)
         db.query(q, params, (err, result) => {
             if(err) throw err
             const orderId = result[0][0].ORDER_ID
