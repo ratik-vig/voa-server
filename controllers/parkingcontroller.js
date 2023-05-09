@@ -10,7 +10,6 @@ router.use(cors())
 
 router.post('/issueTicket', async(req, res) => {
     try{
-        console.log(req.body.obj)
         db.query(queries.issueParkingTicket, [req.body.obj.inTime, req.body.obj.visitorId], (err, result) => {
             if(err) throw err
             res.send(result)
@@ -68,8 +67,6 @@ router.post('/payTicket', async(req, res) => {
             params.push(cvv)
             params.push(cardType)
         }
-        console.log(q)
-        console.log(params)
         db.query(q, params, (err, result) => {
             if(err) throw err
             const orderId = result[0][0].ORDER_ID
