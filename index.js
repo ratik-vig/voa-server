@@ -4,7 +4,10 @@ const dotenv = require('dotenv')
 
 const userController = require('./controllers/usercontroller')
 const attractionController = require('./controllers/attractioncontroller')
-const showcontroller = require('./controllers/showcontroller')
+const showController = require('./controllers/showcontroller')
+const storeController = require('./controllers/storecontroller')
+const visitorController = require('./controllers/visitorcontroller')
+const parkingController = require('./controllers/parkingcontroller')
 
 dotenv.config()
 
@@ -18,7 +21,10 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/users', userController)
 app.use('/api/v1/attractions', attractionController)
-app.use('/api/v1/shows', showcontroller)
+app.use('/api/v1/shows', showController)
+app.use('/api/v1/stores', storeController)
+app.use('/api/v1/visitors', visitorController)
+app.use('/api/v1/parking', parkingController)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {

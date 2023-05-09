@@ -28,7 +28,7 @@ s3 = new AWS.S3({
 })
 
 router.post('/register', userValidators.createUser, (req, res) => {
-    const { email, password, is_admin } = req.body
+    const { email, password, is_admin, is_member } = req.body
     db.query(queries.checkIfUserExists, [email], (err, results) => {
 
         if(err) throw err        
@@ -39,7 +39,7 @@ router.post('/register', userValidators.createUser, (req, res) => {
 
         const salt = bcrypt.genSaltSync(10)
         const hashedPassword = bcrypt.hashSync(password, salt)
-        db.query(queries.createUser, [email, hashedPassword, is_admin], (error, result) => {
+        db.query(queries.createUser, [email, hashedPassword, is_admin, is_member], (error, result) => {
             if(error) throw error
             if(result.affectedRows){
                 res.status(200).send('User created')
@@ -58,11 +58,11 @@ router.post('/login', userValidators.loginUser, (req, res) => {
             res.status(404).send({error: 'User does not exist'})
             return
         }
-        // const passwordMatch = password === result[0].password
         const passwordMatch = bcrypt.compareSync(password, result[0].user_password)
         if(passwordMatch){
+            console.log(result)
             jwt.sign({
-                data: {email: result[0].email, is_admin: result[0].is_admin}
+                data: {userId: result[0].user_id, email: result[0].user_email, is_admin: result[0].is_admin}
               }, process.env.JWT_SECRET, { expiresIn: '1d' }, (err, token) => {
                 if(err) throw err
                 res.status(200).send(token)
@@ -75,64 +75,65 @@ router.post('/login', userValidators.loginUser, (req, res) => {
 
 router.post('/buyTickets', (req, res) => {
 
-    const {visitors, ticket_method} = req.body
-    let visitorId = 0
-    let ticketOrderId = 0
-
-    db.query(queries.getVisitorLock, (err, result) => {
-        if(err) throw(err)
-        
-        db.query(queries.findLastAddedVisitor, (err, result) => {
-            if(err) throw (err)
-    
-            if(result[0]){
-                visitorId = result[0].visitor_id + 1
-            }else{
-                visitorId = 1
-            }
-
-            db.query(queries.createTicketOrder, [Date.now(), 0], (err, result) => {
-                if(err) throw (err)
-
-                db.query(queries.findLastTicketOrder, (err, result) => {
-                    if(err) throw (err)
-            
-                    if(result[0]){
-                        ticketOrderId = result[0].t_order_id
-                        console.log(ticketOrderId)
-                    }else{
-                        t_order_id = 1
-                    }
-
-                    visitors.map(visitor => {
-                        db.query(queries.createVisitor, [...visitor], (err, result) => {
-                            if(err) throw (err) 
-                            console.log(visitorId)
-                            db.query(queries.createTicket, [ticket_method, "adult", "group",visitorId, ticketOrderId], (err, result) => {
-                                if(err) throw (err) 
-                                
-                                db.query(queries.createVisit, [Date.now(), visitorId], (err, result) => {
-                                    if(err) throw (err)
-                                    if(result){
-                                        visitorId++
-                                    }
-                                })
-                            })
-                        })
-                        
-                    })
-
-                })
-            })
-    
-        })
-        db.query(queries.relaseVisitorLock, (err, result) => {
+    let {
+        userId,
+        ticketMethod,
+        ticketType,
+        visitDate,
+        payMethod,
+        cardName,
+        cardNum,
+        expMon,
+        expYear,
+        cardCVV,
+        cardType,
+        visitors
+    } = req.body.obj
+    visitors = JSON.parse(visitors)
+    try{
+        db.query(queries.buyTicket, [
+            userId, 
+            ticketMethod, 
+            ticketType, 
+            visitDate, 
+            new Date(new Date().toLocaleString('en', {timeZone: 'America/New_York'})),
+            payMethod,
+            cardName,
+            cardNum,
+            expMon,
+            expYear,
+            cardCVV,
+            cardType
+            ], (err, result) => {
             if(err) throw err
-            if(result){
-                res.send(200)
-            }
+            console.log(result)
+            const ticketID = result[0][0].TIC_ID
+            const orderID = result[1][0].ORDER_ID
+            visitors.map(visitor => {
+                db.query(queries.addVisitorToTicket, [ticketID, visitor.fname, visitor.lname, visitor.dob, visitor.email, visitor.phone, visitor.addr, visitor.city, visitor.state, visitor.zip], (err, result) => {
+                    if(err) throw err
+                    
+                }) 
+            })
+            res.status(200).send({orderID})
         })
+    }catch(error){
+        console.log(error)
+        res.sendStatus(500)
+    }
+})
 
+router.get('/ticketOrderDetails', (req, res) => {
+    const { order_id } = req.query
+    console.log(order_id)
+    db.query(queries.ticketOrderDetails, [order_id], (err, result) => {
+        if(err) throw err
+        console.log(result)
+        if(!result[0]) {
+            res.sendStatus(404)
+            return
+        }
+        res.send(result)
     })
 })
 

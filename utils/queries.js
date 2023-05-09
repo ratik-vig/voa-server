@@ -1,6 +1,6 @@
 const queries = {
     checkIfUserExists: "select count(*) as count from voa.rdh_user where user_email=?",
-    createUser: "insert into voa.rdh_user(user_email, user_password, is_admin) values(?,?,?)",
+    createUser: "insert into voa.rdh_user(user_email, user_password, is_admin, is_member) values(?,?,?,?)",
     loginUser: "select * from voa.rdh_user where user_email=?",
     createConversation: "insert into flashchat.fc_conversations(fc_conv_user1, fc_conv_user2, fc_conv_date_created) values(?,?,?)",
     getAttractionNames: "select atrn_id, atrn_name from voa.rdh_attraction order by atrn_name limit 10",
@@ -13,7 +13,28 @@ const queries = {
     findLastAddedVisitor: "select visitor_id from rdh_visitor order by visitor_id desc limit 1",
     findLastTicketOrder: "select t_order_id from rdh_ticket_order order by t_order_id desc limit 1",
     createTicket: "insert into voa.rdh_ticket(ticket_method, ticket_type, visitor_type, visitor_id, t_order_id) values (?,?,?,?,?)",
-    createVisit: "insert into voa.rdh_visit(visit_date, visitor_id) values (?,?)"
+    createVisit: "insert into voa.rdh_visit(visit_date, visitor_id) values (?,?)",
+    buyTicket: "call sp_buyTicket(?,?,?,?,?,?,?,?,?,?,?,?, @tic_id, @order_id)",
+    addVisitorToTicket: "call sp_addVisitorsToTicket(?,?,?,?,?,?,?,?,?,?)",
+    getStoreNames: "select store_id, store_name from voa.rdh_store order by store_name limit 10",
+    getStoreById: "select * from voa.rdh_store where store_id=?",
+    getFutureVisitorsByUId: "select visitor_id, visitor_fname, visitor_lname, visit_date from rdh_visitor v natural join rdh_ticket t natural join rdh_user u where u.user_id = ? and t.visit_date >= ?",
+    getSkusById: "select * from rdh_sku where store_id=?",
+    placeOrder: "call sp_placeOrder(?,?,?,?,?,?,?,?,?,?,@orderId)",
+    placeOrderCash: "call sp_placeOrderCash(?,?,?,?,@orderId)",
+    addItemsToOrder: "call sp_addItemsToOrder(?,?,?,?) ",
+    ticketOrderDetails: "select * from rdh_ticket_order natural join rdh_ticket natural join rdh_visitor where t_order_id = ?",
+    getShowDetails: "select * from rdh_show where show_id=?",
+    getShowTimings: "select * from rdh_show_timings where show_id=?",
+    getVisitorsByIdDate: "select visitor_id, visitor_fname, visitor_lname, visit_date, visitor_type, visitor_dob from rdh_visitor v natural join rdh_ticket t natural join rdh_user u where u.user_id = ? and t.visit_date = ?",
+    getHolidaysByDate: "select * from rdh_holiday where holiday_date =?",
+    addShowTicket: "call sp_addShowTickets(?,?,?,?,?)",
+    getStoreOrderDetails: "select * from rdh_order o natural join rdh_order_sku natural join rdh_sku natural join rdh_store where o.order_id = ?",
+    getShowOrderDetails: "select * from rdh_order o natural join rdh_show_ticket natural join rdh_show_timings natural join rdh_show where o.order_id=?",
+    getShowTime: "select start_time, end_time from rdh_show_timings where time_id=?",
+    issueParkingTicket: "insert into rdh_parking_tick(in_time, visitor_id, parking_fee) values(?,?,10.0)",
+    getParkingTicket: "select * from rdh_parking_tick where parking_id=?",
+    addExitTime: "insert into rdh_parking_tick(out_time, order_id) values (?,?)"
 }
-
-module.exports = queries
+  
+module.exports = queries 
